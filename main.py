@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 
-# Load the background image and resize it dynamically based on screen size later
+# Load the background image
 background_image = cv2.imread("background.jpg")
 
 # Callback function for mouse events
@@ -18,8 +18,10 @@ def mouse_callback(event, x, y, flags, param):
 cv2.namedWindow("Wear and Tear Shoe Detection", cv2.WND_PROP_FULLSCREEN)
 cv2.setWindowProperty("Wear and Tear Shoe Detection", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
 
-# Retrieve the current screen size
-screen_width, screen_height = cv2.getWindowImageRect("Wear and Tear Shoe Detection")[2:4]
+# Give time for window to open, and get screen dimensions
+cv2.waitKey(500)  # Wait for 0.5 second to ensure the window opens properly
+screen_width = int(cv2.getWindowProperty("Wear and Tear Shoe Detection", cv2.WND_PROP_FULLSCREEN))
+screen_height = int(cv2.getWindowProperty("Wear and Tear Shoe Detection", cv2.WND_PROP_FULLSCREEN))
 
 # Resize background to match screen size
 background_image = cv2.resize(background_image, (screen_width, screen_height))
