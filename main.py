@@ -1,8 +1,21 @@
 import cv2
 import numpy as np
+from screeninfo import get_monitors
 
-# Load the background image and resize it dynamically based on screen size later
+# Retrieve the current screen size
+monitor = get_monitors()[0]  # Get the first monitor (primary)
+screen_width = monitor.width
+screen_height = monitor.height
+
+# Load the background image and resize it
 background_image = cv2.imread("background.jpg")
+background_image = cv2.resize(background_image, (screen_width, screen_height))
+
+# Create a solid black overlay tint
+tint = np.zeros_like(background_image, dtype=np.uint8)
+tint[:] = (0, 0, 0)  # Solid black
+alpha = 0.8  # Tint strength
+tinted_background = cv2.addWeighted(background_image, 1 - alpha, tint, alpha, 0)  # Applying tint
 
 # Callback function for mouse events
 def mouse_callback(event, x, y, flags, param):
@@ -17,18 +30,6 @@ def mouse_callback(event, x, y, flags, param):
 # Create a fullscreen window
 cv2.namedWindow("Wear and Tear Shoe Detection", cv2.WND_PROP_FULLSCREEN)
 cv2.setWindowProperty("Wear and Tear Shoe Detection", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
-
-# Retrieve the current screen size
-screen_width, screen_height = cv2.getWindowImageRect("Wear and Tear Shoe Detection")[2:4]
-
-# Resize background to match screen size
-background_image = cv2.resize(background_image, (screen_width, screen_height))
-
-# Create a solid black tint
-tint = np.zeros_like(background_image, dtype=np.uint8)
-tint[:] = (0, 0, 0)  # Solid black
-alpha = 0.9  # Tint strength
-tinted_background = cv2.addWeighted(background_image, 1 - alpha, tint, alpha, 0)  # Applying tint
 
 # Centered positioning
 title_text = "Wear and Tear Shoe Detection"
