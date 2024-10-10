@@ -1,8 +1,9 @@
 import cv2
 import numpy as np
 from screeninfo import get_monitors ## need this to support getting screen size for MacOS devices
+import easygui
 
-
+exit = False
 monitor = get_monitors()[0]  ## Gets the screen size of monitor. [0] = primary monitor
 screen_width = monitor.width
 screen_height = monitor.height
@@ -22,13 +23,14 @@ tinted_background = cv2.addWeighted(background_image, 1 - alpha, tint, alpha, 0)
 
 ## Callback function for mouse events, used to figure out what button on screen was pressed
 def mouse_callback(event, x, y, flags, param):
+    global exit ## wont work in mouse callback unless variable is global or returned
     if event == cv2.EVENT_LBUTTONDOWN:
         if button1_coords[0] <= x <= button1_coords[2] and button1_coords[1] <= y <= button1_coords[3]:  # Button 1 area
             print("Option 1 selected")
         elif button2_coords[0] <= x <= button2_coords[2] and button2_coords[1] <= y <= button2_coords[3]:  # Button 2 area
-            print("Option 2 selected")
+            imageToAnalyze = easygui.fileopenbox(filetypes=["*.jpg","*.jpeg","*.png"]) ## upload image 
         elif button3_coords[0] <= x <= button3_coords[2] and button3_coords[1] <= y <= button3_coords[3]:  # Button 3 area
-            print("Option 3 selected")
+            exit = True ## exit is true, program will shut down
 
 
 ## Creating the fullscreen window
@@ -64,8 +66,6 @@ font_thickness = 3
 ## Draws the tinted background to the screen
 image = tinted_background.copy()
 
-
-
 ## scaling button based on screen height
 button_height = int(0.07 * screen_height)  ## button height is 7% of the screen height
 button_width = int(0.3 * screen_width)     ## button width is 0.3% of screen width
@@ -93,14 +93,14 @@ cv2.putText(image, button3_text, ((screen_width - button3_width) // 2, button3_c
 ## set the mouse callback function
 cv2.setMouseCallback("Wear and Tear Shoe Detection", mouse_callback)
 
-while True:
+
+## Main program loop
+while not exit:## doesnt exit loop until exit is set to True
     ## Show the image to the screen
     cv2.imshow("Wear and Tear Shoe Detection", image)
 
-    ## Check if space key is pressed to close program
-    key = cv2.waitKey(1) & 0xFF
-    if key == ord(' '):  # Exit on space bar
-        break
+    ## needs time for program to process mouse clicks
+    cv2.waitKey(1)
 
 ## Clean up
 cv2.destroyAllWindows()
