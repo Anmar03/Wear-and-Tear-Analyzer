@@ -84,19 +84,21 @@ class StainDetector:
         # Calculate histograms for both shoes
         hist1 = self.calc_histogram(shoes[0])
         hist2 = self.calc_histogram(shoes[1])
+        max_threshold = 100.0
 
         # Compare histograms using chi-square method 
         self.similarity = cv2.compareHist(hist1, hist2, cv2.HISTCMP_CHISQR)
+        self.similarity = max(0, (1 - self.similarity / max_threshold) * 100)
 
-        high_similarity = 20
-        moderate_similarity = 40
+        high_similarity = 80
+        moderate_similarity = 60
 
-        if self.similarity < high_similarity:
-            print(f"The shoes slightly differ in colour by {self.similarity:.2f}%")
-        elif self.similarity < moderate_similarity:
-            print(f"The shoes moderately differ in colour by {self.similarity:.2f}%")
+        if self.similarity >= high_similarity:
+            print(f"The shoes are highly similar in color with a similarity of {self.similarity:.2f}%.")
+        elif self.similarity >= moderate_similarity:
+            print(f"The shoes have moderate color similarity with a similarity of {self.similarity:.2f}%.")
         else:
-            print(f"The shoes significantly differ in colour by {self.similarity:.2f}%")
+            print(f"The shoes are not similar in color with a similarity of {self.similarity:.2f}%.")
 
 
 # Test the class
