@@ -2,40 +2,17 @@ import cv2
 import numpy as np
 from screeninfo import get_monitors ## need this to support getting screen size for MacOS devices
 import easygui
+from DeformationDetector import DeformationDetector
+
 
 exit = False
 monitor = get_monitors()[0]  ## Gets the screen size of monitor. [0] = primary monitor
 screen_width = monitor.width
 screen_height = monitor.height
 
-
 ## resize background image to screen size
 background_image = cv2.imread("background.jpg")
 background_image = cv2.resize(background_image, (screen_width, screen_height))
-
-
-## Creates a solid black tint over background image
-tint = np.zeros_like(background_image, dtype=np.uint8)
-tint[:] = (0, 0, 0)  ## Solid black
-alpha = 0.8  ## Change this to change tint strength, changes alpha channel value
-tinted_background = cv2.addWeighted(background_image, 1 - alpha, tint, alpha, 0)  ## Apply tint
-
-
-## Callback function for mouse events, used to figure out what button on screen was pressed
-def mouse_callback(event, x, y, flags, param):
-    global exit ## wont work in mouse callback unless variable is global or returned
-    if event == cv2.EVENT_LBUTTONDOWN:
-        if button1_coords[0] <= x <= button1_coords[2] and button1_coords[1] <= y <= button1_coords[3]:  # Button 1 area
-            print("Option 1 selected")
-        elif button2_coords[0] <= x <= button2_coords[2] and button2_coords[1] <= y <= button2_coords[3]:  # Button 2 area
-            imageToAnalyze = easygui.fileopenbox(filetypes=["*.jpg","*.jpeg","*.png"]) ## upload image 
-        elif button3_coords[0] <= x <= button3_coords[2] and button3_coords[1] <= y <= button3_coords[3]:  # Button 3 area
-            exit = True ## exit is true, program will shut down
-
-
-## Creating the fullscreen window
-cv2.namedWindow("Wear and Tear Shoe Detection", cv2.WND_PROP_FULLSCREEN)
-cv2.setWindowProperty("Wear and Tear Shoe Detection", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
 
 
 ## set texts
@@ -53,6 +30,36 @@ font_scale_title = 2
 font_scale_prompt = 1
 font_scale_buttons = 0.8
 font_thickness = 3
+
+imageToAnalyze = cv2.imread("./TwoShoes.jpg")
+detector = DeformationDetector(imageToAnalyze, title_text, screen_width, screen_height)
+
+
+## Creates a solid black tint over background image
+tint = np.zeros_like(background_image, dtype=np.uint8)
+tint[:] = (0, 0, 0)  ## Solid black
+alpha = 0.8  ## Change this to change tint strength, changes alpha channel value
+tinted_background = cv2.addWeighted(background_image, 1 - alpha, tint, alpha, 0)  ## Apply tint
+
+
+## Callback function for mouse events, used to figure out what button on screen was pressed
+def mouse_callback(event, x, y, flags, param):
+    global exit ## wont work in mouse callback unless variable is global or returned
+    if event == cv2.EVENT_LBUTTONDOWN:
+        if button1_coords[0] <= x <= button1_coords[2] and button1_coords[1] <= y <= button1_coords[3]:  # Button 1 area
+            print("Option 1 selected")
+            detector.clear_screen()
+            detector.run()
+        elif button2_coords[0] <= x <= button2_coords[2] and button2_coords[1] <= y <= button2_coords[3]:  # Button 2 area
+            imageToAnalyze = easygui.fileopenbox(filetypes=["*.jpg","*.jpeg","*.png"]) ## upload image 
+        elif button3_coords[0] <= x <= button3_coords[2] and button3_coords[1] <= y <= button3_coords[3]:  # Button 3 area
+            exit = True ## exit is true, program will shut down
+
+
+## Creating the fullscreen window
+cv2.namedWindow("Wear and Tear Shoe Detection", cv2.WND_PROP_FULLSCREEN)
+cv2.setWindowProperty("Wear and Tear Shoe Detection", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
+
 
 
 ## getting the size of the text so that the button dimensions are dynamic and based on the size of the text.
@@ -93,11 +100,11 @@ cv2.putText(image, button3_text, ((screen_width - button3_width) // 2, button3_c
 ## set the mouse callback function
 cv2.setMouseCallback("Wear and Tear Shoe Detection", mouse_callback)
 
-
+cv2.imshow("Wear and Tear Shoe Detection", image)
 ## Main program loop
 while not exit:## doesnt exit loop until exit is set to True
     ## Show the image to the screen
-    cv2.imshow("Wear and Tear Shoe Detection", image)
+
 
     ## needs time for program to process mouse clicks
     cv2.waitKey(1)
