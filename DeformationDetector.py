@@ -16,10 +16,9 @@ class DeformationDetector:
 
     def run(self):
         """Main function to process the image and analyze the shoes."""
-        # Load the image
-        self.image = cv2.imread('./TwoShoes.jpg')
 
         # Resize the image to the specified screen dimensions
+        # height, width = self.image.shape[:2]
         self.image = cv2.resize(self.image, (self.screen_width, self.screen_height))
 
         # Convert to grayscale
@@ -93,7 +92,7 @@ class DeformationDetector:
             cv2.drawContours(self.image, [contour2], -1, (255, 0, 0), 2)  # Blue
 
             # Show the image with contours
-            cv2.imshow('Wear and Tear Shoe Detection', self.image)
+            cv2.imshow(self.window_name, self.image)
             cv2.waitKey(0)
 
             # Overlay two shoes to see differences
